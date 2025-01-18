@@ -1,17 +1,13 @@
 package com.omible.smartomega;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Mod.EventBusSubscriber(modid = SmartOmega.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -78,6 +74,10 @@ public class Config
             .comment("If enabled, shows admin/member tags on chat")
             .define("tag_names", true);
 
+    public static final ForgeConfigSpec.ConfigValue<String> WELCOME_MSG = BUILDER
+            .comment("Shows to a player when joined")
+            .define("welcome_message", "");
+
     private static final ForgeConfigSpec.Builder MiscEnd = BUILDER.pop();
     // MISC END
 
@@ -93,6 +93,7 @@ public class Config
     public static Set<String> allowedIps;
     public static Set<String> allowedNames;
     public static Boolean tagNames;
+    public static String welcomeMessage;
 
 
 
@@ -116,5 +117,6 @@ public class Config
         allowedIps = new HashSet<>(OP_IPS.get());
         allowedNames = new HashSet<>(OP_NAMES.get());
         tagNames = TAG_NAMES.get();
+        welcomeMessage = WELCOME_MSG.get();
     }
 }

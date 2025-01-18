@@ -4,23 +4,16 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.logging.LogUtils;
 import com.omible.smartomega.commands.OOPCommand;
 import com.omible.smartomega.commands.RunCommand;
-import net.minecraft.client.particle.SuspendedParticle;
-import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundTabListPacket;
-import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerConnectionListener;
-import net.minecraft.server.network.ServerLoginPacketListenerImpl;
-import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.server.players.PlayerList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerLifecycleEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,8 +21,6 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -44,6 +35,7 @@ public class SmartOmega
     public static int clock = 0;
     public static MinecraftServer server;
     public static File modDirectory;
+    public static File dataDirectory;
 
     public static final String MODID = "smartomega";
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -61,9 +53,14 @@ public class SmartOmega
         server = event.getServer();
         File serverDirectory = server.getServerDirectory();
         modDirectory = new File(serverDirectory, "omega/commands/");
+        dataDirectory = new File(serverDirectory, "omega/data/");
 
         if(!modDirectory.exists()){
             modDirectory.mkdirs();
+        }
+
+        if(!dataDirectory.exists()){
+            dataDirectory.mkdirs();
         }
 
         Parser.loadOCommands(modDirectory);
@@ -75,22 +72,26 @@ public class SmartOmega
 
         for (ServerPlayer player : players) {
             String ping = String.valueOf(player.latency);
-            String name = String.valueOf(player.getName());
+            String name = player.getName().getString();
             String ip = player.getIpAddress();
             String health = String.valueOf(Math.round(player.getHealth()));
+            String playerCount = String.valueOf(server.getPlayerList().getPlayerCount());
 
             String headerContent = Config.tablistHeader
                     .replaceAll("(?<!\\\\)&","§")
                     .replaceAll("\\{ping}", ping)
                     .replaceAll("\\{name}", name)
                     .replaceAll("\\{ip}", ip)
+                    .replaceAll("\\{count}", playerCount)
                     .replaceAll("\\{health}", health);
+
 
             String footerContent = Config.tablistFooter
                     .replaceAll("(?<!\\\\)&","§")
                     .replaceAll("\\{ping}", ping)
                     .replaceAll("\\{name}", name)
                     .replaceAll("\\{ip}", ip)
+                    .replaceAll("\\{count}", playerCount)
                     .replaceAll("\\{health}", health);
 
             Component header = Component.literal(headerContent);
@@ -134,8 +135,6 @@ public class SmartOmega
         // Mod Clock
         @SubscribeEvent
         public static void onClockTick(TickEvent.ServerTickEvent event) {
-
-
             if (event.phase == TickEvent.Phase.END) {
                 clock++;
 
@@ -173,10 +172,33 @@ public class SmartOmega
             ServerPlayer player = (ServerPlayer) event.getEntity();
             GameProfile profile = player.getGameProfile();
             PlayerList list = server.getPlayerList();
+            String welcomeMessage = Config.welcomeMessage;
 
             if(Config.deopOnJoin && list.isOp(profile)){
                 list.deop(profile);
                 LOGGER.info(String.format("Player %s was deoped because he joined.", player.getName()));
+            }
+
+            if(!welcomeMessage.isEmpty()){
+                String ping = String.valueOf(player.latency);
+                String name = player.getName().getString();
+                String ip = player.getIpAddress();
+                String playerCount = String.valueOf(server.getPlayerCount());
+
+                Component message;
+
+                welcomeMessage = welcomeMessage
+                        .replaceAll("\\{ping}", ping)
+                        .replaceAll("\\{name}", name)
+                        .replaceAll("\\{ip}", ip)
+                        .replaceAll("\\{count}", playerCount);
+
+                try {
+                    message = Objects.requireNonNull(Component.Serializer.fromJson(welcomeMessage));
+                    player.sendSystemMessage(message);
+                } catch (Exception e){
+                    LOGGER.error("Error sending welcome message, does it use a valid json format?");
+                }
             }
         }
     }
