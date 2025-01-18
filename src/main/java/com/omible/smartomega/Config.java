@@ -19,6 +19,9 @@ public class Config
 {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
+    // TABLIST
+    private static final ForgeConfigSpec.Builder TablistHeader = BUILDER.push("TabList");
+
     public static final ForgeConfigSpec.ConfigValue<String> TABLIST_HEADER = BUILDER
             .comment("Message on the top of the TabList, you can use minecraft format")
             .define("tablist_header", "Default Header");
@@ -27,7 +30,26 @@ public class Config
             .comment("Message on the bottom of the TabList")
             .define("tablist_footer", "Default Footer");
 
+    private static final ForgeConfigSpec.Builder TablistEnd = BUILDER.pop();
+    //  TABLIST END
 
+    //  T0 RECON START
+    private static final ForgeConfigSpec.Builder T0SecurityHeader = BUILDER.push("Security T0 - AlreadyOnline");
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ALREADY_LOGON_SEC = BUILDER
+            .comment("If enabled: Cancels logins if the account is already playing")
+            .define("already_login_security", true);
+
+    private static final ForgeConfigSpec.Builder T0SecurityEnd = BUILDER.pop();
+    //  T0 RECON END
+
+
+    // T2 OP START
+    private static final ForgeConfigSpec.Builder OPSecurityHeader = BUILDER.push("Security T2 - OP");
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> DEOP_ONJOIN = BUILDER
+            .comment("Whether to disable op on player join")
+            .define("deop_onjoin", true);
 
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEOP_ONLEAVE = BUILDER
             .comment("Whether to disable op on player leave")
@@ -45,15 +67,33 @@ public class Config
             .comment("List of allowed names to access oop command, leave empty to disable")
             .defineListAllowEmpty("op_allowed_names", List.of(), Config::validateName);
 
+
+    private static final ForgeConfigSpec.Builder OPSecurityEnd = BUILDER.pop();
+    // T2 OP END
+
+    // MISC HEADER
+    private static final ForgeConfigSpec.Builder MiscHeader = BUILDER.push("Miscellaneous");
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> TAG_NAMES = BUILDER
+            .comment("If enabled, shows admin/member tags on chat")
+            .define("tag_names", true);
+
+    private static final ForgeConfigSpec.Builder MiscEnd = BUILDER.pop();
+    // MISC END
+
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
 
     public static String tablistHeader;
     public static String tablistFooter;
+    public static Boolean alreadyLoginCancel;
+    public static Boolean deopOnJoin;
     public static Boolean deopOnLeave;
     public static String opPassword;
     public static Set<String> allowedIps;
     public static Set<String> allowedNames;
+    public static Boolean tagNames;
+
 
 
     private static boolean validateIp(final Object obj){
@@ -69,9 +109,12 @@ public class Config
     static void onLoad(final ModConfigEvent event) {
         tablistHeader = TABLIST_HEADER.get();
         tablistFooter = TABLIST_FOOTER.get();
+        alreadyLoginCancel = ALREADY_LOGON_SEC.get();
+        deopOnJoin = DEOP_ONJOIN.get();
         deopOnLeave = DEOP_ONLEAVE.get();
         opPassword = OP_PASSWORD.get();
         allowedIps = new HashSet<>(OP_IPS.get());
         allowedNames = new HashSet<>(OP_NAMES.get());
+        tagNames = TAG_NAMES.get();
     }
 }
