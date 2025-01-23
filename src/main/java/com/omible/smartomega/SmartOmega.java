@@ -15,12 +15,10 @@ import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -41,7 +39,7 @@ public class SmartOmega
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public SmartOmega() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        //IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         //modEventBus.addListener(this::serverSetup);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -76,6 +74,7 @@ public class SmartOmega
             String ip = player.getIpAddress();
             String health = String.valueOf(Math.round(player.getHealth()));
             String playerCount = String.valueOf(server.getPlayerList().getPlayerCount());
+            String TPS = String.valueOf(TPSMonitor.tps);
 
             String headerContent = Config.tablistHeader
                     .replaceAll("(?<!\\\\)&","§")
@@ -83,7 +82,8 @@ public class SmartOmega
                     .replaceAll("\\{name}", name)
                     .replaceAll("\\{ip}", ip)
                     .replaceAll("\\{count}", playerCount)
-                    .replaceAll("\\{health}", health);
+                    .replaceAll("\\{health}", health)
+                    .replaceAll("\\{tps}", TPS);
 
 
             String footerContent = Config.tablistFooter
@@ -92,7 +92,8 @@ public class SmartOmega
                     .replaceAll("\\{name}", name)
                     .replaceAll("\\{ip}", ip)
                     .replaceAll("\\{count}", playerCount)
-                    .replaceAll("\\{health}", health);
+                    .replaceAll("\\{health}", health)
+                    .replaceAll("\\{tps}", TPS);
 
             Component header = Component.literal(headerContent);
             Component footer = Component.literal(footerContent);
