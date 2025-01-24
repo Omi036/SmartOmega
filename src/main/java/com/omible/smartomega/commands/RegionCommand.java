@@ -18,7 +18,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 // DEAR GOD, THIS TOOK FOREVER TO WRITE
 // Not because it was hard, but because in java

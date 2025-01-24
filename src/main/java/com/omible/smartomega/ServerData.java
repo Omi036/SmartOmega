@@ -69,6 +69,4 @@ public class ServerData {
             saveJson(filename, new JsonObject());
         }
     }
-
-
 }
