@@ -70,6 +70,10 @@ public class Config
     // MISC HEADER
     private static final ForgeConfigSpec.Builder MiscHeader = BUILDER.push("Miscellaneous");
 
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ALLOW_REGIONS = BUILDER
+            .comment("If enabled, allows protective regions")
+            .define("regions_enabled", true);
+
     public static final ForgeConfigSpec.ConfigValue<Boolean> TAG_NAMES = BUILDER
             .comment("If enabled, shows admin/member tags on chat")
             .define("tag_names", true);
@@ -94,6 +98,7 @@ public class Config
     public static Set<String> allowedNames;
     public static Boolean tagNames;
     public static String welcomeMessage;
+    public static Boolean regionsEnabled;
 
 
 
@@ -118,5 +123,6 @@ public class Config
         allowedNames = new HashSet<>(OP_NAMES.get());
         tagNames = TAG_NAMES.get();
         welcomeMessage = WELCOME_MSG.get();
+        regionsEnabled = ALLOW_REGIONS.get();
     }
 }

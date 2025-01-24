@@ -21,6 +21,7 @@ public class RunCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher){
 
         LiteralArgumentBuilder<CommandSourceStack> sourceStack = Commands.literal(COMMAND_NAME)
+                .requires(source -> source.hasPermission(4))
             .then(Commands.argument("script", StringArgumentType.string())
             .executes(RunCommand::execute));
 

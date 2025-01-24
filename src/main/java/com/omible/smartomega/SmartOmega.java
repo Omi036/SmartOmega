@@ -1,19 +1,27 @@
 package com.omible.smartomega;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.logging.LogUtils;
 import com.omible.smartomega.commands.OOPCommand;
+import com.omible.smartomega.commands.RegionCommand;
 import com.omible.smartomega.commands.RunCommand;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundTabListPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -34,16 +42,13 @@ public class SmartOmega
     public static MinecraftServer server;
     public static File modDirectory;
     public static File dataDirectory;
+    private static JsonObject regions;
 
     public static final String MODID = "smartomega";
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public SmartOmega() {
-        //IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        //modEventBus.addListener(this::serverSetup);
-
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-
         MinecraftForge.EVENT_BUS.addListener(this::serverSetup);
     }
 
@@ -62,6 +67,13 @@ public class SmartOmega
         }
 
         Parser.loadOCommands(modDirectory);
+        reloadRegions();
+    }
+
+    // Regions
+    public static void reloadRegions(){
+        ServerData.ensureData(Region.REGION_FILENAME);
+        regions = ServerData.getJson(Region.REGION_FILENAME);
     }
 
     // TabList
@@ -150,6 +162,7 @@ public class SmartOmega
         public static void registerCommands(RegisterCommandsEvent event){
             OOPCommand.register(event.getDispatcher());
             RunCommand.register(event.getDispatcher());
+            RegionCommand.register(event.getDispatcher());
         }
 
 
@@ -201,6 +214,75 @@ public class SmartOmega
                     LOGGER.error("Error sending welcome message, does it use a valid json format?");
                 }
             }
+        }
+
+
+        @SubscribeEvent
+        public static void onBlockBreak(BlockEvent.BreakEvent event) {
+            if(!Config.regionsEnabled) return;
+
+            BlockPos blockPos = event.getPos();
+            ServerPlayer player = (ServerPlayer) event.getPlayer();
+            String dimension = player.level().dimension().location().toString();
+
+
+            if(regions.has(dimension)){
+                JsonArray regionList = regions.getAsJsonArray(dimension);
+                regionList.forEach(region -> {
+                    Region currentRegion = Region.fromJson(region.getAsJsonObject());
+                    if( currentRegion.empty || !currentRegion.properties.get("enabled") ) return;
+                    if( currentRegion.properties.get("opOverride") && server.getPlayerList().isOp(player.getGameProfile())) return;
+
+                    if(BlockUtils.isBlockBetween(blockPos, BlockUtils.BlockPosFromVec3(currentRegion.startPos), BlockUtils.BlockPosFromVec3(currentRegion.endPos))){
+                        event.setCanceled(true);
+
+                        player.sendSystemMessage(Component.literal("No puedes romper este bloque").withStyle(style -> style.withColor(0xc94f4f)));
+                    }
+                });
+            }
+        }
+
+
+        @SubscribeEvent
+        public static void onBlockPlaced(BlockEvent.EntityPlaceEvent event){
+            if(!Config.regionsEnabled) return;
+
+            BlockPos blockPos = event.getPos();
+            Entity entity = event.getEntity();
+            String dimension = entity.level().dimension().location().toString();
+
+            if(!regions.has(dimension)) return;
+
+            JsonArray regionList = regions.getAsJsonArray(dimension);
+            regionList.forEach(region -> {
+                Region currentRegion = Region.fromJson(region.getAsJsonObject());
+                if( currentRegion.empty || !currentRegion.properties.get("enabled") ) return;
+                if( entity instanceof ServerPlayer && currentRegion.properties.get("opOverride") && server.getPlayerList().isOp(((ServerPlayer) entity).getGameProfile())) return;
+
+                if( BlockUtils.isBlockBetween(blockPos, currentRegion.startPos, currentRegion.endPos)){
+                    event.setCanceled(true);
+
+                    entity.sendSystemMessage(Component.literal("No puedes colocar este bloque aqui").withStyle(style -> style.withColor(0xc94f4f)));
+                }
+            });
+        }
+
+
+
+        @SubscribeEvent
+        public static void onDetonate(ExplosionEvent.Detonate event){
+            if(!Config.regionsEnabled) return;
+
+            String dimension = event.getLevel().dimension().location().toString();
+            List<BlockPos> affectedBlocks = event.getAffectedBlocks();
+
+            JsonArray regionList = regions.getAsJsonArray(dimension);
+            regionList.forEach(region -> {
+                Region currentRegion = Region.fromJson(region.getAsJsonObject());
+                if( currentRegion.empty || !currentRegion.properties.get("enabled") ) return;
+
+                affectedBlocks.removeIf(blockPos -> BlockUtils.isBlockBetween(blockPos, currentRegion.startPos, currentRegion.endPos));
+            });
         }
     }
 }
