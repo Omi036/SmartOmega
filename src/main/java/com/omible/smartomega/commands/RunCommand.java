@@ -13,9 +13,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 
-
+@SuppressWarnings("SameReturnValue")
 public class RunCommand {
-    public static String COMMAND_NAME = "run";
+    public static final String COMMAND_NAME = "run";
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher){
 
         LiteralArgumentBuilder<CommandSourceStack> sourceStack = Commands.literal(COMMAND_NAME)

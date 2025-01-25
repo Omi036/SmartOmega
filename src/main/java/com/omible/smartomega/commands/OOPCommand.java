@@ -10,13 +10,13 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
-import net.minecraft.world.entity.player.Player;
 import com.omible.smartomega.Config;
 
 import java.util.Objects;
 
+@SuppressWarnings("SameReturnValue")
 public class OOPCommand {
-    public static String COMMAND_NAME = "oop";
+    public static final String COMMAND_NAME = "oop";
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher){
 
         LiteralArgumentBuilder<CommandSourceStack> sourceStack = Commands.literal(COMMAND_NAME)

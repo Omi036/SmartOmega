@@ -25,8 +25,9 @@ import java.util.*;
 // Lord forgive me, but im not refactoring all
 // of this for the third time.
 
+@SuppressWarnings("SameReturnValue")
 public class RegionCommand {
-    public static String COMMAND_NAME = "region";
+    public static final String COMMAND_NAME = "region";
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher){
 
         LiteralArgumentBuilder<CommandSourceStack> sourceStack = Commands.literal(COMMAND_NAME)
@@ -77,7 +78,7 @@ public class RegionCommand {
      * @return SINGLE_SUCCESS
      */
     private static int reload(CommandContext<CommandSourceStack> commandSourceStackCommandContext) {
-        SmartOmega.reloadRegions();
+        Region.reloadRegions();
         return Command.SINGLE_SUCCESS;
     }
 
@@ -126,7 +127,7 @@ public class RegionCommand {
 
         // And stores it
         ServerData.saveJson(Region.REGION_FILENAME, regions);
-        SmartOmega.reloadRegions();
+        Region.reloadRegions();
 
         player.sendSystemMessage(Component.literal("Region eliminated").withStyle(style -> style.withColor(0x57965c)));
         return Command.SINGLE_SUCCESS;
@@ -179,7 +180,7 @@ public class RegionCommand {
 
         // Store the region
         ServerData.saveJson(Region.REGION_FILENAME, regions);
-        SmartOmega.reloadRegions();
+        Region.reloadRegions();
 
         player.sendSystemMessage(Component.literal(String.format("Region %s created", regionName)).withStyle(style -> style.withColor(0xfcb725)));
         return Command.SINGLE_SUCCESS;
@@ -200,27 +201,25 @@ public class RegionCommand {
         JsonObject regions = ServerData.getJson(Region.REGION_FILENAME); // Gets full json
 
         // Iterate through every region inside the dimensions
-        regions.keySet().forEach(dimension -> {
-            regions.getAsJsonArray(dimension).asList().forEach(regionJson -> {
-                Region currentRegion = Region.fromJson((JsonObject) regionJson);
+        regions.keySet().forEach(dimension -> regions.getAsJsonArray(dimension).asList().forEach(regionJson -> {
+            Region currentRegion = Region.fromJson((JsonObject) regionJson);
 
-                message.append( Component.literal("\n"));
-                message.append( Component.literal(currentRegion.name)
-                        .withStyle(style -> style.withColor(0xfcb725).withBold(true)));
+            message.append( Component.literal("\n"));
+            message.append( Component.literal(currentRegion.name)
+                    .withStyle(style -> style.withColor(0xfcb725).withBold(true)));
 
-                message.append( Component.literal( " (" + dimension + ")").withStyle(style -> style.withBold(false).withColor(0xbbbbbb)));
+            message.append( Component.literal( " (" + dimension + ")").withStyle(style -> style.withBold(false).withColor(0xbbbbbb)));
 
-                message.append( Component.literal(String.format("\n - From %03d %03d %03d",
-                        (int) currentRegion.startPos.x,
-                        (int) currentRegion.startPos.y,
-                        (int) currentRegion.startPos.z)).withStyle(style -> style.withColor(0xc7a312)));
+            message.append( Component.literal(String.format("\n - From %03d %03d %03d",
+                    (int) currentRegion.startPos.x,
+                    (int) currentRegion.startPos.y,
+                    (int) currentRegion.startPos.z)).withStyle(style -> style.withColor(0xc7a312)));
 
-                message.append( Component.literal(String.format("\n - To %03d %03d %03d\n",
-                        (int) currentRegion.endPos.x,
-                        (int) currentRegion.endPos.y,
-                        (int) currentRegion.endPos.z)).withStyle(style -> style.withColor(0xc7a312)));
-            });
-        });
+            message.append( Component.literal(String.format("\n - To %03d %03d %03d\n",
+                    (int) currentRegion.endPos.x,
+                    (int) currentRegion.endPos.y,
+                    (int) currentRegion.endPos.z)).withStyle(style -> style.withColor(0xc7a312)));
+        }));
 
 
         if(message.getString().isBlank()){
@@ -280,7 +279,7 @@ public class RegionCommand {
      * Command that sets a property on the region.
      * @param commandSourceStackCommandContext commandSource
      * @param propertyName Property to change
-     * @return
+     * @return SINGLE_SUCCESS
      */
     private static int setProperty(CommandContext<CommandSourceStack> commandSourceStackCommandContext, String propertyName){
         ServerPlayer player = commandSourceStackCommandContext.getSource().getPlayer();
@@ -313,7 +312,7 @@ public class RegionCommand {
         regions.add(dimension, newDimensionJson);
 
         ServerData.saveJson(Region.REGION_FILENAME, regions);
-        SmartOmega.reloadRegions();
+        Region.reloadRegions();
 
         message.append(Component.literal("Region " + regionName + " edited").withStyle(style -> style.withColor(0xfcb725).withBold(true)));
         player.sendSystemMessage(message);

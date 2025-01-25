@@ -15,8 +15,9 @@ public class Region {
     public Map<String, Boolean> properties;
     public Boolean empty;
 
-    public static Region Empty = new Region();
-    public static String REGION_FILENAME = "regions.json";
+    public static JsonObject regions;
+    public static final Region Empty = new Region();
+    public static final String REGION_FILENAME = "regions.json";
 
     public Region(String name, Vec3 startPos, Vec3 endPos, Map<String, Boolean> properties){
         this.name = name;
@@ -43,9 +44,7 @@ public class Region {
         endPosArray.add(endPos.z);
 
         JsonObject propertiesObject = new JsonObject();
-        properties.keySet().forEach(key -> {
-            propertiesObject.addProperty(key, properties.get(key));
-        });
+        properties.keySet().forEach(key -> propertiesObject.addProperty(key, properties.get(key)));
 
         JsonObject object = new JsonObject();
         object.addProperty("name", this.name);
@@ -73,11 +72,9 @@ public class Region {
 
         Vec3 startPosVec = new Vec3(startPos.get(0).getAsInt(), startPos.get(1).getAsInt(), startPos.get(2).getAsInt());
         Vec3 endPosVec = new Vec3(endPos.get(0).getAsInt(), endPos.get(1).getAsInt(), endPos.get(2).getAsInt());
-        Map<String, Boolean> propertiesObject = new HashMap<String, Boolean>();
+        Map<String, Boolean> propertiesObject = new HashMap<>();
 
-        properties.keySet().forEach(key -> {
-            propertiesObject.put(key, properties.get(key).getAsBoolean());
-        });
+        properties.keySet().forEach(key -> propertiesObject.put(key, properties.get(key).getAsBoolean()));
 
         return new Region(name, startPosVec, endPosVec, propertiesObject);
     }
@@ -108,5 +105,11 @@ public class Region {
 
         newDimensionJson.add(newRegion);
         return newDimensionJson;
+    }
+
+
+    public static void reloadRegions() {
+        ServerData.ensureData(Region.REGION_FILENAME);
+        regions = ServerData.getJson(REGION_FILENAME);
     }
 }

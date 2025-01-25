@@ -11,9 +11,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class ServerData {
-    private static File dataDirectory = SmartOmega.dataDirectory;
+    private static final File dataDirectory = SmartOmega.dataDirectory;
     private static final Gson GSON = new Gson();
-
 
 
     /**

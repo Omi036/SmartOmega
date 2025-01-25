@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
+@SuppressWarnings("UnusedParameters")
 @Mod.EventBusSubscriber(modid = SmartOmega.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Config
 {

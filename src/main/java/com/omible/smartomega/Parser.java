@@ -1,9 +1,11 @@
 package com.omible.smartomega;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,8 +18,9 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Parser {
+    private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static HashMap<String, List<String>> scripts = new HashMap<String, List<String>>();
+    public static HashMap<String, List<String>> scripts = new HashMap<>();
     private static final Queue<ScheduledCommand> commandQueue = new LinkedBlockingQueue<>();
     private static int tickCounter = 0;
 
@@ -31,7 +34,7 @@ public class Parser {
                     scripts.put(ocommand.getName(), statements);
 
                 } catch (IOException e){
-                    e.printStackTrace();
+                    LOGGER.error(e.toString());
                 }
 
             }
