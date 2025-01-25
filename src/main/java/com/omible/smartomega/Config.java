@@ -67,6 +67,7 @@ public class Config
     private static final ForgeConfigSpec.Builder OPSecurityEnd = BUILDER.pop();
     // T2 OP END
 
+
     // MISC HEADER
     private static final ForgeConfigSpec.Builder MiscHeader = BUILDER.push("Miscellaneous");
 
@@ -85,6 +86,33 @@ public class Config
     private static final ForgeConfigSpec.Builder MiscEnd = BUILDER.pop();
     // MISC END
 
+
+    // DISCORD WEBHOOK START
+    private static final ForgeConfigSpec.Builder WebhookHeader = BUILDER.push("Discord Webhook");
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> ALLOW_DISCOHOOK = BUILDER
+            .comment("If enabled, send discord webhook notifications")
+            .define("discord_webhook_enabled", false);
+
+    public static final ForgeConfigSpec.ConfigValue<String> DISCOHOOK_URL = BUILDER
+            .comment("URL To send webhooks")
+            .define("discord_webhook_url", "");
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> DISCOHOOK_STARTUP_ENABLED = BUILDER
+            .comment("Send webhooks on server startup?")
+            .define("discord_webhook_startup", true);
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> DISCOHOOK_CLIENT_ENABLED = BUILDER
+            .comment("Send webhooks on player join/left?")
+            .define("discord_webhook_client", true);
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> DISCOHOOK_DEATH_ENABLED = BUILDER
+            .comment("Send webhooks on player death?")
+            .define("discord_webhook_death", true);
+
+    private static final ForgeConfigSpec.Builder WebhookEnd = BUILDER.pop();
+    // DISDORD WEBHOOK END
+
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
 
@@ -99,6 +127,12 @@ public class Config
     public static Boolean tagNames;
     public static String welcomeMessage;
     public static Boolean regionsEnabled;
+
+    public static Boolean webhooksEnabled;
+    public static String webhookUrl;
+    public static Boolean webhooksStartupEnabled;
+    public static Boolean webhooksClientEnabled;
+    public static Boolean webhooksDeathEnabled;
 
 
 
@@ -124,5 +158,11 @@ public class Config
         tagNames = TAG_NAMES.get();
         welcomeMessage = WELCOME_MSG.get();
         regionsEnabled = ALLOW_REGIONS.get();
+
+        webhooksEnabled = ALLOW_DISCOHOOK.get();
+        webhookUrl = DISCOHOOK_URL.get();
+        webhooksStartupEnabled = DISCOHOOK_STARTUP_ENABLED.get();
+        webhooksClientEnabled = DISCOHOOK_CLIENT_ENABLED.get();
+        webhooksDeathEnabled = DISCOHOOK_DEATH_ENABLED.get();
     }
 }

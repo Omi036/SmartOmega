@@ -1,6 +1,7 @@
 package com.omible.smartomega;
 
 import com.omible.smartomega.events.*;
+import com.omible.smartomega.DiscordWebhook.EmbedObject;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundTabListPacket;
 import net.minecraft.server.MinecraftServer;
@@ -11,7 +12,9 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 
+import java.awt.*;
 import java.io.File;
+import java.time.Instant;
 import java.util.List;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -36,6 +39,7 @@ public class SmartOmega {
         // Register other Event Handlers
         MinecraftForge.EVENT_BUS.register(new PlayerJoinEventHandler());
         MinecraftForge.EVENT_BUS.register(new PlayerLeftEventHandler());
+        MinecraftForge.EVENT_BUS.register(new PlayerDeathEventHandler());
         MinecraftForge.EVENT_BUS.register(new ClockTickEventHandler());
         MinecraftForge.EVENT_BUS.register(new RegisterCommandEventHandler());
         MinecraftForge.EVENT_BUS.register(new ServerChatEventHandler());
@@ -59,6 +63,19 @@ public class SmartOmega {
         // Reload command and regions
         Parser.loadOCommands(modDirectory);
         Region.reloadRegions();
+
+        // Notifies to Discord Webhook
+        if(Config.webhooksEnabled && Config.webhooksStartupEnabled){
+            DiscordWebhook webhook = new DiscordWebhook(Config.webhookUrl);
+            EmbedObject embed = new EmbedObject()
+                .setTitle("🔵 ServerStart")
+                .setDescription("The server is now online")
+                .setColor(new Color(0x5eced9))
+                .setFooter( "ID: " + Instant.now().getEpochSecond(), "");
+
+            webhook.addEmbed(embed);
+            webhook.execute();
+        }
     }
 
 
