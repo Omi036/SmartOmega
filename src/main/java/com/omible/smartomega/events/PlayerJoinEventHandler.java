@@ -1,10 +1,12 @@
 package com.omible.smartomega.events;
 
+import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.logging.LogUtils;
 import com.omible.smartomega.Config;
 import com.omible.smartomega.DiscordWebhook.EmbedObject;
 import com.omible.smartomega.DiscordWebhook;
+import com.omible.smartomega.ServerData;
 import com.omible.smartomega.SmartOmega;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,13 +26,53 @@ public class PlayerJoinEventHandler {
     public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event){
         ServerPlayer player = (ServerPlayer) event.getEntity();
         GameProfile profile = player.getGameProfile();
+        String playerIp = player.connection.getRemoteAddress().toString().split(":")[0].replace("/","");
+        String playerName = profile.getName();
         PlayerList list = SmartOmega.server.getPlayerList();
         String welcomeMessage = Config.welcomeMessage;
 
+        // T2 Security - OP Protection
         if(Config.deopOnJoin && list.isOp(profile)){
             list.deop(profile);
             LOGGER.info("Player {} was deoped because he joined.", player.getName());
         }
+
+
+        // T1 Security - ImPersonation
+        if(Config.ipSecurityEnabled){
+            ServerData.ensureData("players.json");
+            JsonObject players = ServerData.getJson("players.json");
+
+            if(players.has(playerName)){
+                JsonObject playerRecord = (JsonObject) players.get(playerName);
+                String last_ip = playerRecord.get("last_ip").getAsString();
+                int timeSafe = playerRecord.get("timesafe").getAsInt();
+                long last_connection = playerRecord.get("last_connection").getAsLong();
+                long eta_time = last_connection + timeSafe*1000L;
+
+                // If timesafe is still valid and IP differs.
+                if(System.currentTimeMillis() < eta_time && !last_ip.equals(playerIp)){
+                    player.connection.disconnect(Component.literal(Config.kickMessage).withStyle(style -> style.withColor(0xff2222)));
+                    LOGGER.error(String.format("[CRITICAL] Connection with IP %s tried to join to %s, but it differs on IP", playerIp, playerName));
+                    return;
+                }
+
+                playerRecord.addProperty("last_ip", playerIp);
+                playerRecord.addProperty("last_connection", System.currentTimeMillis());
+                players.add(playerName, playerRecord);
+                ServerData.saveJson("players.json", players);
+
+            } else {
+                JsonObject newPlayer = new JsonObject();
+                newPlayer.addProperty("timesafe", Config.ipTimeSafe);
+                newPlayer.addProperty("last_ip", playerIp);
+                newPlayer.addProperty("last_connection", System.currentTimeMillis());
+
+                players.add(playerName, newPlayer);
+                ServerData.saveJson("players.json", players);
+            }
+        }
+
 
         // Send welcome message
         if(!welcomeMessage.isEmpty()){
@@ -54,6 +96,8 @@ public class PlayerJoinEventHandler {
                 LOGGER.error("Error sending welcome message, does it use a valid json format?");
             }
         }
+
+
 
 
         // Send discord webhook

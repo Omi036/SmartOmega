@@ -40,6 +40,25 @@ public class Config
     //  T0 RECON END
 
 
+    //  T1 IMPERSONATE START
+    private static final ForgeConfigSpec.Builder T1SecurityHeader = BUILDER.push("Security T0 - AlreadyOnline");
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> IP_SECURITY_ENABLED = BUILDER
+            .comment("If enabled: Cancles the login attempt if the ip doesnt match the latest connection")
+            .define("account_ip_mismatch", true);
+
+    public static final ForgeConfigSpec.ConfigValue<Integer> IP_SECURITY_TIMESAFE = BUILDER
+            .comment("Defines how much (in seconds) has to pass in order to another ip to match")
+            .define("account_ip_timesafe", 10800);
+
+    public static final ForgeConfigSpec.ConfigValue<String> IP_SECURITY_KICK_MESSAGE = BUILDER
+            .comment("Kick message to show if IP mismatchs")
+            .define("account_ip_mismatch_message", "Account IP Mismatch, contact an Administrator.");
+
+    private static final ForgeConfigSpec.Builder T1SecurityEnd = BUILDER.pop();
+    //  T1 IMPERSONATE END
+
+
     // T2 OP START
     private static final ForgeConfigSpec.Builder OPSecurityHeader = BUILDER.push("Security T2 - OP");
 
@@ -118,12 +137,19 @@ public class Config
 
     public static String tablistHeader;
     public static String tablistFooter;
+
     public static Boolean alreadyLoginCancel;
+
+    public static Boolean ipSecurityEnabled;
+    public static Integer ipTimeSafe;
+    public static String kickMessage;
+
     public static Boolean deopOnJoin;
     public static Boolean deopOnLeave;
     public static String opPassword;
     public static Set<String> allowedIps;
     public static Set<String> allowedNames;
+
     public static Boolean tagNames;
     public static String welcomeMessage;
     public static Boolean regionsEnabled;
@@ -149,12 +175,19 @@ public class Config
     static void onLoad(final ModConfigEvent event) {
         tablistHeader = TABLIST_HEADER.get();
         tablistFooter = TABLIST_FOOTER.get();
+
         alreadyLoginCancel = ALREADY_LOGON_SEC.get();
+
+        ipSecurityEnabled = IP_SECURITY_ENABLED.get();
+        ipTimeSafe = IP_SECURITY_TIMESAFE.get();
+        kickMessage = IP_SECURITY_KICK_MESSAGE.get();
+
         deopOnJoin = DEOP_ONJOIN.get();
         deopOnLeave = DEOP_ONLEAVE.get();
         opPassword = OP_PASSWORD.get();
         allowedIps = new HashSet<>(OP_IPS.get());
         allowedNames = new HashSet<>(OP_NAMES.get());
+
         tagNames = TAG_NAMES.get();
         welcomeMessage = WELCOME_MSG.get();
         regionsEnabled = ALLOW_REGIONS.get();
