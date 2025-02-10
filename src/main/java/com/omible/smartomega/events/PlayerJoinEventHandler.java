@@ -8,9 +8,17 @@ import com.omible.smartomega.DiscordWebhook.EmbedObject;
 import com.omible.smartomega.DiscordWebhook;
 import com.omible.smartomega.ServerData;
 import com.omible.smartomega.SmartOmega;
+import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.slf4j.Logger;
@@ -117,6 +125,18 @@ public class PlayerJoinEventHandler {
             webhook.addEmbed(embed);
             webhook.execute();
         }
-    }
 
+
+        // If EventMode is enabled:
+        if(SmartOmega.eventModeEnabled){
+            // play music
+            SoundEvent sound = SoundEvent.createVariableRangeEvent(new ResourceLocation("omil:ambient.rountable"));
+            player.playNotifySound(sound, SoundSource.AMBIENT, 1.0f, 1.0f);
+
+            // Clear inventory and give currency
+            player.getInventory().clearContent();
+            player.getInventory().add(new ItemStack(Items.DIAMOND, 4));
+            player.getInventory().add(new ItemStack(Items.EMERALD, 4));
+        }
+    }
 }

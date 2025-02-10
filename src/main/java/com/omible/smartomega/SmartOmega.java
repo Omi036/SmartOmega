@@ -23,6 +23,7 @@ public class SmartOmega {
     public static File modDirectory;
     public static File dataDirectory;
     public static int clock = 0;
+    public static boolean eventModeEnabled;
 
     public SmartOmega() {
         // Register mod config
