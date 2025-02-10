@@ -19,6 +19,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ public class PlayerJoinEventHandler {
         // T2 Security - OP Protection
         if(Config.deopOnJoin && list.isOp(profile)){
             list.deop(profile);
+            player.setGameMode(GameType.SURVIVAL);
             LOGGER.info("Player {} was deoped because he joined.", player.getName());
         }
 
