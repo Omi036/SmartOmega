@@ -39,6 +39,7 @@ public class PlayerJoinEventHandler {
         String playerName = profile.getName();
         PlayerList list = SmartOmega.server.getPlayerList();
         String welcomeMessage = Config.welcomeMessage;
+        String welcomeAudio = "omil:event.welcome";
 
         // T2 Security - OP Protection
         if(Config.deopOnJoin && list.isOp(profile)){
@@ -102,12 +103,16 @@ public class PlayerJoinEventHandler {
             try {
                 message = Objects.requireNonNull(Component.Serializer.fromJson(welcomeMessage));
                 player.sendSystemMessage(message);
+
             } catch (Exception e){
                 LOGGER.error("Error sending welcome message, does it use a valid json format?");
             }
         }
 
-
+        // Plays welcome audio to user
+        if(Config.welcomeAudio){
+            player.playNotifySound(SoundEvent.createVariableRangeEvent(new ResourceLocation(welcomeAudio)), SoundSource.BLOCKS, 2, 1);
+        }
 
 
         // Send discord webhook

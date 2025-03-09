@@ -102,6 +102,10 @@ public class Config
             .comment("Shows to a player when joined")
             .define("welcome_message", "");
 
+    public static final ForgeConfigSpec.ConfigValue<Boolean> WELCOME_SOUND = BUILDER
+            .comment("Plays a audio when joines")
+            .define("welcome_audio", false);
+
     private static final ForgeConfigSpec.Builder MiscEnd = BUILDER.pop();
     // MISC END
 
@@ -152,6 +156,7 @@ public class Config
 
     public static Boolean tagNames;
     public static String welcomeMessage;
+    public static Boolean welcomeAudio;
     public static Boolean regionsEnabled;
 
     public static Boolean webhooksEnabled;
@@ -190,6 +195,7 @@ public class Config
 
         tagNames = TAG_NAMES.get();
         welcomeMessage = WELCOME_MSG.get();
+        welcomeAudio = WELCOME_SOUND.get();
         regionsEnabled = ALLOW_REGIONS.get();
 
         webhooksEnabled = ALLOW_DISCOHOOK.get();
