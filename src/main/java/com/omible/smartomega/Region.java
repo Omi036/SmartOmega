@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -14,17 +15,19 @@ public class Region {
     public Vec3 endPos;
     public Map<String, Boolean> properties;
     public Boolean empty;
+    public ArrayList<String> owners;
 
     public static JsonObject regions;
     public static final Region Empty = new Region();
     public static final String REGION_FILENAME = "regions.json";
 
-    public Region(String name, Vec3 startPos, Vec3 endPos, Map<String, Boolean> properties){
+    public Region(String name, Vec3 startPos, Vec3 endPos, Map<String, Boolean> properties, ArrayList<String> owners){
         this.name = name;
         this.startPos = startPos;
         this.endPos = endPos;
         this.properties = properties;
         this.empty = false;
+        this.owners = owners;
     }
 
     public Region(){
@@ -46,11 +49,15 @@ public class Region {
         JsonObject propertiesObject = new JsonObject();
         properties.keySet().forEach(key -> propertiesObject.addProperty(key, properties.get(key)));
 
+        JsonArray ownersArray = new JsonArray();
+        owners.forEach(ownersArray::add);
+
         JsonObject object = new JsonObject();
         object.addProperty("name", this.name);
         object.add("startPos", startPosArray);
         object.add("endPos", endPosArray);
         object.add("properties", propertiesObject);
+        object.add("owners", ownersArray);
 
         return object;
     }
@@ -59,7 +66,8 @@ public class Region {
         if( !(jsonRegion.has("name")
                 && jsonRegion.has("startPos")
                 && jsonRegion.has("endPos")
-                && jsonRegion.has("properties"))) {
+                && jsonRegion.has("properties")
+                && jsonRegion.has("owners"))) {
 
             throw new RuntimeException("Object is not a child of a Region");
         }
@@ -69,14 +77,17 @@ public class Region {
         JsonArray startPos = jsonRegion.getAsJsonArray("startPos");
         JsonArray endPos = jsonRegion.getAsJsonArray("endPos");
         JsonObject properties = jsonRegion.getAsJsonObject("properties");
+        JsonArray owners = jsonRegion.getAsJsonArray("owners");
 
         Vec3 startPosVec = new Vec3(startPos.get(0).getAsInt(), startPos.get(1).getAsInt(), startPos.get(2).getAsInt());
         Vec3 endPosVec = new Vec3(endPos.get(0).getAsInt(), endPos.get(1).getAsInt(), endPos.get(2).getAsInt());
         Map<String, Boolean> propertiesObject = new HashMap<>();
+        ArrayList<String> ownersArray = new ArrayList<>();
+        owners.forEach(owner -> ownersArray.add(owner.toString()));
 
         properties.keySet().forEach(key -> propertiesObject.put(key, properties.get(key).getAsBoolean()));
 
-        return new Region(name, startPosVec, endPosVec, propertiesObject);
+        return new Region(name, startPosVec, endPosVec, propertiesObject, ownersArray);
     }
 
 

@@ -63,6 +63,10 @@ public class RegionCommand {
                             .then(Commands.argument("value", BoolArgumentType.bool())
                             .executes(ctx -> RegionCommand.setProperty(ctx, "enabled"))))
 
+                        .then(Commands.literal("allowInteracts")
+                            .then(Commands.argument("value", BoolArgumentType.bool())
+                            .executes(ctx -> RegionCommand.setProperty(ctx, "allowInteracts"))))
+
                         .then(Commands.literal("opOverride")
                             .then(Commands.argument("value", BoolArgumentType.bool())
                             .executes(ctx -> RegionCommand.setProperty(ctx, "opOverride")))))));
@@ -154,9 +158,10 @@ public class RegionCommand {
         Map<String, Boolean> properties = new HashMap<>();
         properties.put("enabled", true);
         properties.put("opOverride", true);
+        properties.put("allowInteract", false);
 
         // Defines the region give its attributes
-        Region region = new Region(regionName, startPos, endPos, properties);
+        Region region = new Region(regionName, startPos, endPos, properties, new ArrayList<>());
 
         // If regions exists in the dimension, check for duplicates.
         if(regions.has(dimension)) {
@@ -267,7 +272,10 @@ public class RegionCommand {
 
         message.append(Component.literal("Region " + regionName + "\n").withStyle(style -> style.withColor(0xfcb725).withBold(true)));
         message.append(Component.literal(" - enabled: " + selectedRegion.properties.get("enabled") + "\n").withStyle(style -> style.withColor(0xc7a312).withBold(false)));
-        message.append(Component.literal(" - opOverride: " + selectedRegion.properties.get("opOverride")).withStyle(style -> style.withColor(0xc7a312).withBold(false)));
+        message.append(Component.literal(" - opOverride: " + selectedRegion.properties.get("opOverride") + "\n").withStyle(style -> style.withColor(0xc7a312).withBold(false)));
+        message.append(Component.literal(" - allowInteracts: " + selectedRegion.properties.get("allowInteracts") + "\n").withStyle(style -> style.withColor(0xc7a312).withBold(false)));
+        message.append(Component.literal(" - *Owners: " + String.join(",", selectedRegion.owners)).withStyle(style -> style.withColor(0x6894d9).withBold(false)));
+
 
         player.sendSystemMessage(message);
         return Command.SINGLE_SUCCESS;
