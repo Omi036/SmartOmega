@@ -1,14 +1,21 @@
 package com.omible.smartomega;
-import com.google.genai.Client;
-import com.google.genai.types.GenerateContentResponse;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class GenAI {
-    static Client apiClient;
+    static String apiKey = "";
     static String systemPrompt = """
             System:
             
@@ -37,43 +44,75 @@ public class GenAI {
 
     static HashMap<String, Integer> userInteractions = new HashMap<>();
 
-    public static void prepareClient(){
-        String API_KEY = Config.geminiKey;
-        apiClient = Client.builder().apiKey(API_KEY).build();
+    public static void prepareClient() {
+        apiKey = Config.geminiKey;
     }
 
+    public static String promptText(String text, String playerName) {
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=" + apiKey;
 
-    public static String promptText(String text, String playerName)  {
+        String TPS = String.valueOf(TPSMonitor.tps);
+        String userPrompt = String.format("User: %s", text);
+        AtomicReference<String> playerList = new AtomicReference<>("");
+
+        SmartOmega.server.getPlayerList().getPlayers().forEach(player -> {
+            playerList.set(playerList.get() + player.getDisplayName().getString() + ",");
+        });
+
+        String prompt = String.format(
+                systemPrompt,
+                TPS,
+                SmartOmega.server.getPlayerCount(),
+                playerList,
+                playerName,
+                userInteractions.getOrDefault(playerName, 1)
+        ) + userPrompt;
+
+        // Cuerpo de la solicitud JSON
+        String json = "{\n" +
+                      "  \"contents\": [\n" +
+                      "    {\n" +
+                      "      \"parts\": [\n" +
+                      "        {\n" +
+                      "          \"text\": \"" + prompt + "\"\n" +
+                      "        }\n" +
+                      "      ]\n" +
+                      "    }\n" +
+                      "  ]\n" +
+                      "}";
+
+        // Crear el cliente HTTP
+        HttpClient client = HttpClient.newHttpClient();
+
+        // Crear la solicitud HTTP POST
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        // Enviar la solicitud y obtener la respuesta
+        HttpResponse<String> response = null;
         try {
-            String TPS = String.valueOf(TPSMonitor.tps);
-            String userPrompt = String.format("User: %s", text);
-            AtomicReference<String> playerList = new AtomicReference<>("");
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JsonElement jsonElement = JsonParser.parseString(response.body());
 
-            SmartOmega.server.getPlayerList().getPlayers().forEach(player -> {
-                playerList.set( playerList.get() + player.getDisplayName().getString() + ",");
-            });
+            String res = getTextResponse(jsonElement);
+            return res.trim();
 
-            String prompt = String.format(
-                    systemPrompt,
-                    TPS,
-                    SmartOmega.server.getPlayerCount(),
-                    playerList,
-                    playerName,
-                    userInteractions.getOrDefault(playerName, 1)
-            ) + userPrompt;
-
-            GenerateContentResponse response = apiClient.models.generateContent("gemini-2.0-flash-lite", prompt, null);
-
-            if(userInteractions.containsKey(playerName)){
-                userInteractions.put( playerName, userInteractions.get(playerName) +1 );
-            } else {
-                userInteractions.put( playerName, 2 );
-            }
-
-            return  Objects.requireNonNull(response.text()).trim();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return "Error en la IA :(";
+        } catch (IOException | InterruptedException e) {
+            System.out.println(e);
+            return "Error en IA :(";
         }
+    }
+
+    private static String getTextResponse(JsonElement jsonElement) {
+        JsonObject jsonResponse = jsonElement.getAsJsonObject();
+        JsonArray candidates = jsonResponse.getAsJsonArray("candidates");
+        JsonObject firstCandidate = candidates.get(0).getAsJsonObject(); // Solo tomamos el primer candidato
+        JsonObject content = firstCandidate.getAsJsonObject("content");
+        JsonArray parts = content.getAsJsonArray("parts");
+        JsonObject firstPart = parts.get(0).getAsJsonObject(); // Solo tomamos la primera parte
+        return firstPart.get("text").getAsString();
     }
 }

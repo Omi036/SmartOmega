@@ -9,13 +9,6 @@ plugins {
 version = mod_version
 group = mod_group_id
 
-base {
-    archivesName = mod_id
-}
-
-jarJar.enable()
-
-tasks.named("jarJar") {}
 
 // Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -135,11 +128,6 @@ dependencies {
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    minecraftLibrary('com.google.genai:google-genai:0.3.0'){
-        exclude group: "com.google.code.findbugs", module: "jsr305"
-        exclude group: "commons-logging", module: "commons-logging"
-        exclude group: "com.google.guava", module: "listenablefuture"
-    }
 
     
 
@@ -191,6 +179,14 @@ tasks.named('jar', Jar).configure {
                 'Implementation-Vendor'   : mod_authors,
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
+    }
+
+    doLast {
+        copy {
+            from configurations.runtimeClasspath
+            into("$buildDir/libs")
+            include '**/*.jar'
+        }
     }
 
     // This is the preferred method to reobfuscate your jar file
