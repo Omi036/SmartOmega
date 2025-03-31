@@ -9,19 +9,28 @@ import com.omible.smartomega.DiscordWebhook;
 import com.omible.smartomega.ServerData;
 import com.omible.smartomega.SmartOmega;
 import net.minecraft.client.resources.sounds.Sound;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.slf4j.Logger;
 
 import java.awt.*;
@@ -140,10 +149,28 @@ public class PlayerJoinEventHandler {
             SoundEvent sound = SoundEvent.createVariableRangeEvent(new ResourceLocation("omil:ambient.rountable"));
             player.playNotifySound(sound, SoundSource.AMBIENT, 1.0f, 1.0f);
 
+            try {
+                // Get dimension
+                ResourceKey<Level> dimensionKey = ResourceKey.create(Registries.DIMENSION, new ResourceLocation("theabyss:the_abyss"));
+                ServerLevel targetWorld = SmartOmega.server.getLevel(dimensionKey);
+
+                // Teleport player
+                assert targetWorld != null;
+                player.teleportTo(targetWorld, 1419, 24, 1975, 90, 0);
+            } catch (Exception ignored){}
+
             // Clear inventory and give currency
             player.getInventory().clearContent();
             player.getInventory().add(new ItemStack(Items.DIAMOND, 4));
             player.getInventory().add(new ItemStack(Items.EMERALD, 4));
+
+            // Open help menu
+            SmartOmega.server.getCommands().performPrefixedCommand(SmartOmega.server.createCommandSourceStack(), "openguiscreen help " + playerName);
+
+            // Give effects
+            player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, MobEffectInstance.INFINITE_DURATION, 4, false, false));
+            MobEffect effect = SmartOmega.server.registryAccess().registryOrThrow(Registries.MOB_EFFECT).get(ResourceLocation.tryParse("theabyss:anti_fear_potion"));
+            player.addEffect(new MobEffectInstance(effect, MobEffectInstance.INFINITE_DURATION, 1, false, false));
         }
     }
 }

@@ -62,6 +62,10 @@ public class SmartOmega {
         Parser.loadOCommands(modDirectory);
         Region.reloadRegions();
 
+        // Setups AI
+        if(Config.geminiEnabled) GenAI.prepareClient();
+
+
         // Notifies to Discord Webhook
         if(Config.webhooksEnabled && Config.webhooksStartupEnabled){
             DiscordWebhook webhook = new DiscordWebhook(Config.webhookUrl);

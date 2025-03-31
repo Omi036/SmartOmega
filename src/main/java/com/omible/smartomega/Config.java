@@ -110,6 +110,20 @@ public class Config
     // MISC END
 
 
+    // AI START
+    private static final ForgeConfigSpec.Builder GeminiHeader = BUILDER.push("Gemini AI");
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> AI_ENABLED = BUILDER
+            .comment("Enabled Gemini AI (Nomily) on server")
+            .define("gemini_enabled", false);
+
+    public static final ForgeConfigSpec.ConfigValue<String> AI_KEY = BUILDER
+            .comment("Gemini AI API Key (its free)")
+            .define("gemini_key", "");
+
+    private static final ForgeConfigSpec.Builder GeminiEnd = BUILDER.pop();
+
+
     // DISCORD WEBHOOK START
     private static final ForgeConfigSpec.Builder WebhookHeader = BUILDER.push("Discord Webhook");
 
@@ -159,6 +173,9 @@ public class Config
     public static Boolean welcomeAudio;
     public static Boolean regionsEnabled;
 
+    public static Boolean geminiEnabled;
+    public static String geminiKey;
+
     public static Boolean webhooksEnabled;
     public static String webhookUrl;
     public static Boolean webhooksStartupEnabled;
@@ -197,6 +214,9 @@ public class Config
         welcomeMessage = WELCOME_MSG.get();
         welcomeAudio = WELCOME_SOUND.get();
         regionsEnabled = ALLOW_REGIONS.get();
+
+        geminiEnabled = AI_ENABLED.get();
+        geminiKey = AI_KEY.get();
 
         webhooksEnabled = ALLOW_DISCOHOOK.get();
         webhookUrl = DISCOHOOK_URL.get();
