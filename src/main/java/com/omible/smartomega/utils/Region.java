@@ -1,7 +1,8 @@
-package com.omible.smartomega;
+package com.omible.smartomega.utils;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.omible.smartomega.ServerData;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;

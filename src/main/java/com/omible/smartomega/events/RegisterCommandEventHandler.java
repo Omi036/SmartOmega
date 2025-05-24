@@ -14,6 +14,7 @@ public class RegisterCommandEventHandler {
         RunCommand.register(event.getDispatcher());
         RegionCommand.register(event.getDispatcher());
         EnableEventMode.register(event.getDispatcher());
+        SupportCommand.register(event.getDispatcher());
         if(Config.geminiEnabled) NomilyCommand.register(event.getDispatcher());
     }
 
