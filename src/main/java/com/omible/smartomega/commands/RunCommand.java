@@ -13,6 +13,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 
+import java.util.logging.Logger;
+
+import static com.omible.smartomega.SmartOmega.LOGGER;
+
 @SuppressWarnings("SameReturnValue")
 public class RunCommand {
     public static final String COMMAND_NAME = "run";
@@ -29,29 +33,49 @@ public class RunCommand {
 
     public static int execute(CommandContext<CommandSourceStack> command){
         PlayerList playerList = command.getSource().getServer().getPlayerList();
-        ServerPlayer player = (ServerPlayer) command.getSource().getEntity();
         String scriptname = StringArgumentType.getString(command, "script") + ".ocmd";
 
-        assert player != null;
+        if(command.getSource().isPlayer()){
+            ServerPlayer player = (ServerPlayer) command.getSource().getEntity();
 
-        System.out.println(scriptname);
+            assert player != null;
 
-        if(!playerList.isOp(player.getGameProfile())) {
-            player.sendSystemMessage(Component.literal("§4You're not OP"));
-            return Command.SINGLE_SUCCESS;
+            System.out.println("Executting command " + scriptname);
+
+            if(!playerList.isOp(player.getGameProfile())) {
+                player.sendSystemMessage(Component.literal("§4You're not OP"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            if(scriptname.equals("reload.ocmd")){
+                Parser.loadOCommands(SmartOmega.modDirectory);
+                player.sendSystemMessage(Component.literal("§2Commands updated"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            try{
+                Parser.exec(scriptname);
+            } catch (Error e){
+                player.sendSystemMessage(Component.literal(String.format("§4Error: %s", e.getMessage())));
+            }
+
+
+        } else if (command.getSource().getEntity() == null) {
+            System.out.println("Executting command " + scriptname);
+
+            if(scriptname.equals("reload.ocmd")){
+                Parser.loadOCommands(SmartOmega.modDirectory);
+                LOGGER.info(Component.literal("§2Commands updated"));
+                return Command.SINGLE_SUCCESS;
+            }
+
+            try{
+                Parser.exec(scriptname);
+            } catch (Error e){
+                LOGGER.info(Component.literal(String.format("§4Error: %s", e.getMessage())));
+            }
         }
 
-        if(scriptname.equals("reload.ocmd")){
-            Parser.loadOCommands(SmartOmega.modDirectory);
-            player.sendSystemMessage(Component.literal("§2Commands updated"));
-            return Command.SINGLE_SUCCESS;
-        }
-
-        try{
-            Parser.exec(scriptname);
-        } catch (Error e){
-            player.sendSystemMessage(Component.literal(String.format("§4Error: %s", e.getMessage())));
-        }
 
         return Command.SINGLE_SUCCESS;
     }

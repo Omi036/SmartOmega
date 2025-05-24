@@ -17,7 +17,7 @@ public class TPSMonitor {
             lastTime = currentTime;
 
             // Calcular TPS basado en el tiempo transcurrido entre ticks
-            double tpsNow = 1_000_000_000.0 / (timePassed / (double) TPS_GOAL);
+            double tpsNow = 1_000_000_000.0 / timePassed;
             tps = Math.min(TPS_GOAL, tpsNow);
         }
     }

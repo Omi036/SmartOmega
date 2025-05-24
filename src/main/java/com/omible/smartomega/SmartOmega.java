@@ -12,6 +12,8 @@ import net.minecraftforge.fml.config.ModConfig;
 import java.awt.*;
 import java.io.File;
 import java.time.Instant;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(SmartOmega.MODID)
@@ -19,6 +21,7 @@ import java.time.Instant;
 public class SmartOmega {
     public static final String MODID = "smartomega";
 
+    public static final Logger LOGGER = LogManager.getLogger(MODID);
     public static MinecraftServer server;
     public static File modDirectory;
     public static File dataDirectory;

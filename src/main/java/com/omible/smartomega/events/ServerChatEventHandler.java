@@ -6,6 +6,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import java.util.logging.Logger;
+
+import static com.omible.smartomega.SmartOmega.LOGGER;
+
 public class ServerChatEventHandler {
 
     @SubscribeEvent
@@ -20,6 +24,7 @@ public class ServerChatEventHandler {
             SmartOmega.server.getPlayerList().getPlayers().forEach(player -> {
                 player.sendSystemMessage(message);
             });
+            LOGGER.info(String.format("[%s]: %s", event.getPlayer().getDisplayName().getString(), event.getMessage().getString()));
 
 
         } else {
@@ -29,7 +34,7 @@ public class ServerChatEventHandler {
             SmartOmega.server.getPlayerList().getPlayers().forEach(player -> {
                 player.sendSystemMessage(message);
             });
-
+            LOGGER.info(String.format("[%s]: %s", event.getPlayer().getDisplayName().getString(), event.getMessage().getString()));
         }
 
         event.setCanceled(true);
