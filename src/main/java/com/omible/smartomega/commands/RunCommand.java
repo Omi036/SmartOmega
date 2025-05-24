@@ -5,15 +5,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.omible.smartomega.Parser;
+import com.omible.smartomega.utils.Parser;
 import com.omible.smartomega.SmartOmega;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
-
-import java.util.logging.Logger;
 
 import static com.omible.smartomega.SmartOmega.LOGGER;
 

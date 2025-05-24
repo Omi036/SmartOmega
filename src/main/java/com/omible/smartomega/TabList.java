@@ -1,5 +1,6 @@
 package com.omible.smartomega;
 
+import com.omible.smartomega.utils.TPSMonitor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundTabListPacket;
 import net.minecraft.server.MinecraftServer;

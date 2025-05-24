@@ -1,19 +1,12 @@
 package com.omible.smartomega.events;
 
 import com.omible.smartomega.Config;
-import com.omible.smartomega.DiscordWebhook;
-import com.omible.smartomega.DiscordWebhook.EmbedObject;
-import com.omible.smartomega.SkullUtils;
-import net.minecraft.ChatFormatting;
+import com.omible.smartomega.utils.DiscordWebhook;
+import com.omible.smartomega.utils.DiscordWebhook.EmbedObject;
+import com.omible.smartomega.utils.SkullUtils;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraft.world.entity.player.Player;

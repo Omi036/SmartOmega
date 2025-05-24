@@ -1,7 +1,6 @@
 package com.omible.smartomega.events;
 
 import com.omible.smartomega.Config;
-import com.omible.smartomega.GenAI;
 import com.omible.smartomega.commands.*;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

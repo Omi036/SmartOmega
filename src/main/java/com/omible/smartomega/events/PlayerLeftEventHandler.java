@@ -3,7 +3,7 @@ package com.omible.smartomega.events;
 import com.mojang.authlib.GameProfile;
 import com.mojang.logging.LogUtils;
 import com.omible.smartomega.Config;
-import com.omible.smartomega.DiscordWebhook;
+import com.omible.smartomega.utils.DiscordWebhook;
 import com.omible.smartomega.SmartOmega;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;

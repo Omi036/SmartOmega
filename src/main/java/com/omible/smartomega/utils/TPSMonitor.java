@@ -1,4 +1,4 @@
-package com.omible.smartomega;
+package com.omible.smartomega.utils;
 
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

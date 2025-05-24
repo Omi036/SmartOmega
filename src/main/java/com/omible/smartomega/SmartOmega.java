@@ -1,7 +1,11 @@
 package com.omible.smartomega;
 
 import com.omible.smartomega.events.*;
-import com.omible.smartomega.DiscordWebhook.EmbedObject;
+import com.omible.smartomega.utils.DiscordWebhook;
+import com.omible.smartomega.utils.DiscordWebhook.EmbedObject;
+import com.omible.smartomega.utils.GenAI;
+import com.omible.smartomega.utils.Parser;
+import com.omible.smartomega.utils.Region;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;

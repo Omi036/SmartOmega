@@ -1,6 +1,7 @@
-package com.omible.smartomega;
+package com.omible.smartomega.utils;
 
 import com.mojang.logging.LogUtils;
+import com.omible.smartomega.SmartOmega;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

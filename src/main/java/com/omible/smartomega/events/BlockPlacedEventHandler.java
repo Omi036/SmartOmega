@@ -1,9 +1,9 @@
 package com.omible.smartomega.events;
 
 import com.google.gson.JsonArray;
-import com.omible.smartomega.BlockUtils;
+import com.omible.smartomega.utils.BlockUtils;
 import com.omible.smartomega.Config;
-import com.omible.smartomega.Region;
+import com.omible.smartomega.utils.Region;
 import com.omible.smartomega.SmartOmega;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;

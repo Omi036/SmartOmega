@@ -1,4 +1,4 @@
-package com.omible.smartomega;
+package com.omible.smartomega.utils;
 
 import com.google.gson.JsonArray;
 import net.minecraft.core.BlockPos;
