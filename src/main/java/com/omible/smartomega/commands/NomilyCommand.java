@@ -23,7 +23,7 @@ public class NomilyCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher){
 
         LiteralArgumentBuilder<CommandSourceStack> sourceStack = Commands.literal(COMMAND_NAME)
-                .then(Commands.argument("texto", StringArgumentType.string())
+                .then(Commands.argument("texto", StringArgumentType.greedyString())
                 .executes(NomilyCommand::execute));
 
         dispatcher.register( sourceStack );
